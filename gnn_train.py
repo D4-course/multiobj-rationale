@@ -1,15 +1,27 @@
-import torch
-import torch.nn as nn
-import torch.optim as optim
-import torch.optim.lr_scheduler as lr_scheduler
-from torch.utils.data import DataLoader
+import math
+# import random
+import sys
 
-import math, random, sys
-import numpy as np
+
 import argparse
 
-from fuseprop import *
+import torch
+# import torch.nn as nn
+from torch import nn
+
+from torch.optim import lr_scheduler
+# import torch.optim as optim
+from torch import optim
+# import torch.optim.lr_scheduler as lr_scheduler
+from torch.optim import lr_scheduler
+from torch.utils.data import DataLoader
+
+import numpy as np
+
 import rdkit
+
+from fuseprop import *
+
 
 lg = rdkit.RDLogger.logger() 
 lg.setLevel(rdkit.RDLogger.CRITICAL)
@@ -57,7 +69,8 @@ optimizer = optim.Adam(model.parameters(), lr=args.lr)
 scheduler = lr_scheduler.ExponentialLR(optimizer, args.anneal_rate)
 
 param_norm = lambda m: math.sqrt(sum([p.norm().item() ** 2 for p in m.parameters()]))
-grad_norm = lambda m: math.sqrt(sum([p.grad.norm().item() ** 2 for p in m.parameters() if p.grad is not None]))
+grad_norm = lambda m: math.sqrt(sum([p.grad.norm().item() ** 2 for p in m.parameters()
+                                                             if p.grad is not None]))
 
 total_step = 0
 beta = args.beta
@@ -65,7 +78,8 @@ meters = np.zeros(5)
 
 for epoch in range(args.epoch):
     #dataset = MolPairDataset(traindata, args.atom_vocab, args.batch_size)
-    #dataloader = DataLoader(dataset, batch_size=1, shuffle=True, num_workers=0, collate_fn=lambda x:x[0])
+    #dataloader = DataLoader(dataset, batch_size=1, shuffle=True, 
+    # num_workers=0, collate_fn=lambda x:x[0])
     dataset = DataFolder(args.train, args.batch_size)
 
     for batch in dataset:
@@ -88,7 +102,7 @@ for epoch in range(args.epoch):
             print("[%d] Beta: %.3f, KL: %.2f, loss: %.3f, Word: %.2f, Topo: %.2f, Assm: %.2f, PNorm: %.2f, GNorm: %.2f" % (total_step, beta, meters[0], meters[1], meters[2], meters[3], meters[4], param_norm(model), grad_norm(model)))
             sys.stdout.flush()
             meters *= 0
-        
+
         if args.save_iter >= 0 and total_step % args.save_iter == 0:
             n_iter = total_step // args.save_iter - 1
             torch.save(model.state_dict(), args.save_dir + "/model." + str(n_iter))

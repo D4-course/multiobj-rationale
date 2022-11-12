@@ -1,16 +1,22 @@
-import torch
-import torch.nn as nn
-from torch.utils.data import DataLoader
 
-import math, random, sys
-import numpy as np
+# import math
+import random
+import sys
 import argparse
+
+# import numpy as np
 import rdkit
 from tqdm import tqdm
 
+import torch
+# import torch.nn as nn
+# from torch import nn
+from torch.utils.data import DataLoader
+
+
 from fuseprop import *
 
-lg = rdkit.RDLogger.logger() 
+lg = rdkit.RDLogger.logger()
 lg.setLevel(rdkit.RDLogger.CRITICAL)
 
 parser = argparse.ArgumentParser()
@@ -40,7 +46,7 @@ if type(model_ckpt) is tuple:
     model.load_state_dict(model_ckpt[1])
 else:
     print('loading pre-trained model', file=sys.stderr)
-    testdata = [line.split()[1] for line in open(args.rationale)] 
+    testdata = [line.split()[1] for line in open(args.rationale)]
     testdata = unique_rationales(testdata)
     model.load_state_dict(model_ckpt)
 
@@ -57,4 +63,3 @@ with torch.no_grad():
         final_smiles = model.decode(init_smiles)
         for x,y in zip(init_smiles, final_smiles):
             print(x, y)
-

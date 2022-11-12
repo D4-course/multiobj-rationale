@@ -1,4 +1,4 @@
-name: rationale
+name: env
 
 channels:
   - pytorch

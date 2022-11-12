@@ -1,9 +1,10 @@
-import sys
+# import sys
+
 import argparse
 import math
-from rdkit import Chem
 from functools import partial
 from multiprocessing import Pool
+from rdkit import Chem
 from fuseprop import find_clusters, extract_subgraph
 from properties import get_scoring_function
 
@@ -11,7 +12,7 @@ MIN_ATOMS = 15
 C_PUCT = 10
 
 class MCTSNode():
-
+    """ Monte carlo tree search node """
     def __init__(self, smiles, atoms, W=0, N=0, P=0):
         self.smiles = smiles
         self.atoms = set(atoms)
@@ -50,20 +51,22 @@ def mcts_rollout(node, state_map, orig_smiles, clusters, atom_cls, nei_cls, scor
                     node.children.append(new_node)
 
         state_map[node.smiles] = node
-        if len(node.children) == 0: return node.P  # cannot find leaves
+        if len(node.children) == 0: 
+            return node.P  # cannot find leaves
 
         scores = scoring_function([x.smiles for x in node.children])
         for child, score in zip(node.children, scores):
             child.P = score
-        
+
     sum_count = sum([c.N for c in node.children])
     selected_node = max(node.children, key=lambda x : x.Q() + x.U(sum_count))
-    v = mcts_rollout(selected_node, state_map, orig_smiles, clusters, atom_cls, nei_cls, scoring_function)
+    v = mcts_rollout(selected_node, state_map, orig_smiles,
+        clusters, atom_cls, nei_cls, scoring_function)
     selected_node.W += v
     selected_node.N += 1
     return v
 
-def mcts(smiles, scoring_function, n_rollout, max_atoms, prop_delta): 
+def mcts(smiles, scoring_function, n_rollout, max_atoms, prop_delta):
     mol = Chem.MolFromSmiles(smiles)
     clusters, atom_cls = find_clusters(mol)
     nei_cls = [0] * len(clusters)
@@ -71,15 +74,16 @@ def mcts(smiles, scoring_function, n_rollout, max_atoms, prop_delta):
         nei_cls[i] = [nei for atom in cls for nei in atom_cls[atom]]
         nei_cls[i] = set(nei_cls[i]) - set([i])
         clusters[i] = set(list(cls))
-    for a in range(len(atom_cls)):
-        atom_cls[a] = set(atom_cls[a])
-    
-    root = MCTSNode( smiles, set(range(mol.GetNumAtoms())) ) 
+    for ind in range(len(atom_cls)):
+        atom_cls[ind] = set(atom_cls[ind])
+
+    root = MCTSNode( smiles, set(range(mol.GetNumAtoms())) )
     state_map = {smiles : root}
     for _ in range(n_rollout):
         mcts_rollout(root, state_map, smiles, clusters, atom_cls, nei_cls, scoring_function)
 
-    rationales = [node for _,node in state_map.items() if len(node.atoms) <= max_atoms and node.P >= prop_delta]
+    rationales = [node for _,node in state_map.items()
+                    if len(node.atoms) <= max_atoms and node.P >= prop_delta]
     return smiles, rationales
 
 
@@ -106,9 +110,9 @@ if __name__ == "__main__":
         next(f)
         data = [line.split(',')[0] for line in f]
 
-    work_func = partial(mcts, scoring_function=scoring_function, 
-                              n_rollout=args.rollout, 
-                              max_atoms=args.max_atoms, 
+    work_func = partial(mcts, scoring_function=scoring_function,
+                              n_rollout=args.rollout,
+                              max_atoms=args.max_atoms,
                               prop_delta=args.prop_delta)
 
     pool = Pool(args.ncpu)
@@ -121,4 +125,3 @@ if __name__ == "__main__":
             if x.smiles not in rset:
                 print(orig_smiles, x.smiles, len(x.atoms), x.P)
                 rset.add(x.smiles)
-
