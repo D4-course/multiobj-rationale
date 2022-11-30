@@ -1,3 +1,8 @@
+- Team No: 19, 2019101099, 2019101084
+
+## Running code 
+- `sudo docker build -t multi`
+- `sudo docker run -v "$(pwd):/app" -it -h multi -p "8000:8000" multi`
 # Multi-Objective Molecule Generation using Interpretable Substructures
 
 This is the implementation of our ICML 2020 paper: https://arxiv.org/abs/2002.03244
