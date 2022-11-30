@@ -188,6 +188,7 @@ if __name__ == "__main__":
     funcs = [get_scoring_function(prop) for prop in args.prop.split(',')]
 
     data = [line.split()[:2] for line in sys.stdin]
+    # print(data)
     all_x, all_y = zip(*data)
     props = [func(all_y) for func in funcs]
 

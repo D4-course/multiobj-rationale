@@ -1,0 +1,10 @@
+smiles,gsk3
+Nc1nonc1-c1nc2cc(O)ccc2n1C1CCC1,1
+CCOC(=O)CN=c1nc(-c2ccc(OC)cc2)n(-c2ccccc2)s1,1
+CN1CCN(c2ccc(Nc3nccc(-c4cnn5ncccc45)n3)cc2)CC1,1
+COc1ccc(-c2nc(=NCCO)sn2-c2ccccc2)cc1,1
+CC(C)(C)c1cc(NC(=O)Nc2cccc3ccccc23)n(-c2cccc(C(=O)NCC#N)c2)n1,1
+Cc1cccc(NC(=O)Nc2ccc(-c3cccc4[nH]nc(N)c34)cc2)c1,1
+Nc1nccc2scc(-c3ccc(NC(=O)Nc4cccc(Br)c4)cc3)c12,1
+CN(C)c1ccc(-c2c(-c3ccc4n[nH]c(N)c4c3)nnn2Cc2ccccc2)cc1,1
+NS(=O)(=O)c1ccc(NN=C2C(=O)Nc3ccc4ncccc4c32)cc1,1
